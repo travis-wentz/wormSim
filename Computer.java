@@ -1,4 +1,10 @@
 
+/**
+ * 
+ * @author TravisWentz
+ * CSCI 476 - Lab 3
+ *
+ */
 public class Computer {
 
 	private boolean vulnerable = false;
