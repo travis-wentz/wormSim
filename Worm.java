@@ -1,4 +1,9 @@
+import java.awt.BorderLayout;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 
 /**
@@ -9,6 +14,8 @@ import java.util.ArrayList;
  */
 public class Worm{
 	
+	static Gui gui;
+	
 	private static int numComputers = 10000;
 	private static Computer[] network = new Computer[numComputers];
 	private static int nVulnerable; //vulnerable computers n<10,000
@@ -16,7 +23,7 @@ public class Worm{
 	private static double pReInfecProb; //random reinfection probability p
 	private static int totalInfections = 0;
 	
-	public void activateWorm(int n, int d, double p){
+	public Worm(int n, int d, double p){
 		nVulnerable = n;
 		dInfections = d;
 		pReInfecProb = p;
@@ -25,7 +32,9 @@ public class Worm{
 		infect();
 	}
 	
-	private void addComputers(){
+	protected void addComputers(){
+		int[] computers = new int[10000]; //1:white 2:black 3:orange 4:red
+		
 		//adding all the computers to the network
 		for(int i = 0; i < network.length; i++){
 			Computer curComp = new Computer();
@@ -41,15 +50,26 @@ public class Worm{
 				}
 			}
 		}
+		for(int i = 0; i < network.length; i++){
+			if(!network[i].getVulnerable()){
+				computers[i] = 1;
+			}else{
+				computers[i] = 2;
+			}
+		}
+		gui.frame2(computers);
 	}
 	
-	private void infect(){
+	protected void infect(){
+		
+		int[] computers = new int[10000]; //1:white 2:black 3:orange 4:red
 		int newInfections = 0;
 		int reInfections = 0;
-		//int round = 0;
 		int overloaded = 0;
 		int curComp;
 		int node;
+		Computer computer;
+		
 		//the worm begins
 		do{
 			node = (int) (Math.random() * (network.length));
@@ -96,10 +116,27 @@ public class Worm{
 						}
 					}
 				}
+				computer = network[i];
+				if(!computer.getVulnerable()){ //computer is not vulnerable
+					computers[i] = 1;
+				}else{
+					if(computer.getInfections() < 1){ //computer is vulnerable and not infected
+						computers[i] = 2;
+					}else if(computer.getInfections() == 1){ //computer has been infected
+						computers[i] = 3;
+					}else if (computer.getInfections() > 1){	//computer has been reinfected
+						computers[i] = 4;
+					}
+				}
 			}
-			//round++;
+			gui.frame2(computers);
 		}while(newInfections > 0 && overloaded < nVulnerable);
 		System.out.println("Reinfections: " + reInfections);
 		System.out.println("Total infections: " + totalInfections);
+	}
+	
+	public static void main(String[] args) {
+		gui = new Gui();
+		gui.frame1(false);
 	}
 }
